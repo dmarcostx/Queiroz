@@ -31,7 +31,7 @@ superusuário e adicione as mesmas linhas `127.0.0.1 keycloak` e `::1 keycloak` 
 
 1.  **Clone o repositório:**
     ```bash
-    git clone <URL_DO_REPOSITORIO>
+    git clone https://github.com/dmarcostx/Queiroz
     cd Queiroz
     ```
 
