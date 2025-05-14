@@ -1,0 +1,62 @@
+<!-- dashboard.component.html -->
+<div class="container">
+
+  <!-- Conteúdo principal -->
+  <main class="content">
+    <button (click)="logout()">Sair</button>
+
+    <!-- CRUD Usuários (admin) -->
+    <section id="users" *ngIf="hasRole('administrador')">
+      <h2>Gestão de Usuários</h2>
+      <button (click)="openCreateUser()">Novo Usuário</button>
+      <table>
+        <thead>
+        <tr><th>Usuário</th><th>Email</th><th>Ações</th></tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <button (click)="editUser(user)">Editar</button>
+            <button (click)="deleteUser(user)">Excluir</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- CRUD Acadêmico -->
+    <section id="academics" *ngIf="hasRole('coordenador') || hasRole('professor') || hasRole('aluno')">
+      <h2>Gestão Acadêmica</h2>
+
+      <!-- Formulário de criação -->
+      <div class="creation-forms" *ngIf="hasRole('coordenador')">
+        <div class="form-group">
+          <h3>Criar Disciplina</h3>
+          <input type="text" placeholder="Título da disciplina" [(ngModel)]="newDisciplineTitle" />
+          <input type="number" placeholder="Número do semestre" [(ngModel)]="newSemesterNumber" max="99" />
+          <input type="text" placeholder="Título do curso" [(ngModel)]="newCourseTitle" />
+          <span *ngIf="newDisciplineInvalid()">{{newDisciplineInvalid()}}</span>
+          <button *ngIf="!newDisciplineInvalid()" (click)="createDiscipline()">Adicionar</button>
+        </div>
+      </div>
+
+      <table *ngIf="hasRole('coordenador') || hasRole('professor') || hasRole('aluno')">
+        <thead>
+        <tr><th>Curso</th><th>Semestre</th><th>Disciplina</th><th *ngIf="hasRole('coordenador')">Ações</th></tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let discipline of disciplines">
+          <td>{{ discipline.course }}</td>
+          <td>{{ discipline.semester }}</td>
+          <td>{{ discipline.name }}</td>
+          <td *ngIf="hasRole('coordenador')">
+            <button (click)="deleteDiscipline(discipline)">Excluir</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>

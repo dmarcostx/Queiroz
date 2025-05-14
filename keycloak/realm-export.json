@@ -1,0 +1,313 @@
+{
+  "realm": "quarkus-app-realm",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginTheme": "keycloak",
+  "accountTheme": "keycloak",
+  "adminTheme": "keycloak",
+  "emailTheme": "keycloak",
+  "clients": [
+    {
+      "clientId": "quarkus-backend-client",
+      "name": "Quarkus Backend Client",
+      "enabled": true,
+      "bearerOnly": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "your-backend-client-secret",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false
+    },
+    {
+      "clientId": "angular-frontend-client",
+      "name": "Angular Frontend Client",
+      "enabled": true,
+      "publicClient": true,
+      "clientAuthenticatorType": "client-secret-post",
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:4200/*",
+        "http://localhost:4200/callback",
+        "http://localhost:4200/logout"
+      ],
+      "webOrigins": [
+        "http://localhost:4200"
+      ],
+      "defaultClientScopes": [
+        "openid",
+        "web-origins",
+        "role_list",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "clientId": "account",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": [
+        "http://keycloak:8180/realms/quarkus-app-realm/account/*"
+      ],
+      "protocol": "openid-connect"
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "administrador",
+        "description": "Administrador do sistema"
+      },
+      {
+        "name": "coordenador",
+        "description": "Coordenador acadêmico"
+      },
+      {
+        "name": "professor",
+        "description": "Professor ou docente"
+      },
+      {
+        "name": "aluno",
+        "description": "Aluno matriculado"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "administrador",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "Strador",
+      "email": "administrador@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "administrador"
+      ]
+    },
+    {
+      "username": "coordenador",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Coorden",
+      "lastName": "Dador",
+      "email": "coordenador@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "coord123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "coordenador"
+      ]
+    },
+    {
+      "username": "professor",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Pro",
+      "lastName": "Fessor",
+      "email": "professor@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "prof123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "professor"
+      ]
+    },
+    {
+      "username": "aluno",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Alu",
+      "lastName": "No",
+      "email": "aluno@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "aluno123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "aluno"
+      ]
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "openid",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": [
+        {
+          "name": "username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "username",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "claim.name": "preferred_username",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    },
+    {
+      "name": "profile",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": [
+        {
+          "name": "first name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "firstName",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "claim.name": "given_name",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "last name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "lastName",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "claim.name": "family_name",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    },
+    {
+      "name": "email",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": [
+        {
+          "name": "email",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "email",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "claim.name": "email",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    },
+    {
+      "name": "roles",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "user.attribute": "role",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    },
+    {
+      "name": "web-origins",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": []
+    },
+    {
+      "name": "role_list",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": []
+    },
+    {
+      "name": "address",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": []
+    },
+    {
+      "name": "phone",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": []
+    },
+    {
+      "name": "offline_access",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": []
+    },
+    {
+      "name": "microprofile-jwt",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "multivalued": "true",
+            "usermodel.realm.role.mapping.role.prefix": "",
+            "claim.name": "groups"
+          }
+        }
+      ]
+    }
+  ]
+}
