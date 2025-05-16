@@ -25,7 +25,14 @@ loopback localhost.
 Para mapear o domínio "keycloak" para o endereço de loopback localhost, você precisa editar o arquivo de hosts tanto no
 seu sistema. No Windows, edite o `C:\Windows\System32\drivers\etc\hosts` como administrator, adicione ao final as linhas
 `127.0.0.1 keycloak` e `::1 keycloak`. No Linux, abra um terminal e edite o arquivo `/etc/hosts` com privilégios de
-superusuário e adicione as mesmas linhas `127.0.0.1 keycloak` e `::1 keycloak` .
+superusuário e adicione as mesmas linhas `127.0.0.1 keycloak` e `::1 keycloak`.
+
+O endereço do keycloak foi um desafio, pois o quarkus verifica se o endereço do emissor é exatamente o endereço que 
+ele próprio está se conectando ao keycloak. Como utilizar http://localhost para se conectar ao keycloak causava erro 
+nessa validação do quarkus, pois ele se conecta por http://keycloak que é o nome do serviço no docker-compose, e 
+para poupar tempo de configuração de proxys decidi trazer o mapeamento de loopback localhost para o endereço 
+keycloak no hosts file da máquina. E essa diferença de endereço também provoca erros de CORS no Angular, que foram 
+corretamente configurados na sua maioria, porém preferi tratar o gerenciamento de usuários diretamente no quarkus.
 
 ## Como Executar a Aplicação
 

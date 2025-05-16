@@ -31,7 +31,7 @@
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
+      "serviceAccountsEnabled": true,
       "redirectUris": [
         "http://localhost:4200/*",
         "http://localhost:4200/callback",
@@ -45,8 +45,7 @@
         "web-origins",
         "role_list",
         "profile",
-        "roles",
-        "email"
+        "roles"
       ],
       "optionalClientScopes": [
         "address",
@@ -69,7 +68,17 @@
     "realm": [
       {
         "name": "administrador",
-        "description": "Administrador do sistema"
+        "description": "Administrador do sistema",
+        "composite": true,
+        "composites": {
+          "client": {
+            "realm-management": [
+              "manage-users",
+              "view-users",
+              "query-users"
+            ]
+          }
+        }
       },
       {
         "name": "coordenador",
@@ -89,10 +98,6 @@
     {
       "username": "administrador",
       "enabled": true,
-      "emailVerified": true,
-      "firstName": "Admin",
-      "lastName": "Strador",
-      "email": "administrador@example.com",
       "credentials": [
         {
           "type": "password",
@@ -107,10 +112,6 @@
     {
       "username": "coordenador",
       "enabled": true,
-      "emailVerified": true,
-      "firstName": "Coorden",
-      "lastName": "Dador",
-      "email": "coordenador@example.com",
       "credentials": [
         {
           "type": "password",
@@ -125,10 +126,6 @@
     {
       "username": "professor",
       "enabled": true,
-      "emailVerified": true,
-      "firstName": "Pro",
-      "lastName": "Fessor",
-      "email": "professor@example.com",
       "credentials": [
         {
           "type": "password",
@@ -143,10 +140,6 @@
     {
       "username": "aluno",
       "enabled": true,
-      "emailVerified": true,
-      "firstName": "Alu",
-      "lastName": "No",
-      "email": "aluno@example.com",
       "credentials": [
         {
           "type": "password",
@@ -184,58 +177,7 @@
     {
       "name": "profile",
       "protocol": "openid-connect",
-      "attributes": {},
-      "protocolMappers": [
-        {
-          "name": "first name",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-property-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.attribute": "firstName",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "userinfo.token.claim": "true",
-            "claim.name": "given_name",
-            "jsonType.label": "String"
-          }
-        },
-        {
-          "name": "last name",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-property-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.attribute": "lastName",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "userinfo.token.claim": "true",
-            "claim.name": "family_name",
-            "jsonType.label": "String"
-          }
-        }
-      ]
-    },
-    {
-      "name": "email",
-      "protocol": "openid-connect",
-      "attributes": {},
-      "protocolMappers": [
-        {
-          "name": "email",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-property-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.attribute": "email",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "userinfo.token.claim": "true",
-            "claim.name": "email",
-            "jsonType.label": "String"
-          }
-        }
-      ]
+      "attributes": {}
     },
     {
       "name": "roles",

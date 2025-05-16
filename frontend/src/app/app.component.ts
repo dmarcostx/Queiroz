@@ -10,8 +10,11 @@ export class AppComponent implements OnInit {
   isAuthenticated = false;
   entities: any[] = [];
   userData: any = null;
-  users: any = null;
+  users: any = [];
+  newUsername: string = "";
+  newPassword: string = "";
   disciplines: any = [];
+  newRole: string = "";
   newDisciplineTitle: string = "";
   newCourseTitle: string = "";
   newSemesterNumber: number = 0;
@@ -19,33 +22,46 @@ export class AppComponent implements OnInit {
   private readonly oidcSecurityService = inject(OidcSecurityService);
   private readonly http = inject(HttpClient);
   private backendApiUrl = 'http://localhost:8080';
-  private kcUrl = 'http://keycloak:8180/realms/quarkus-app-realm/users';
 
   ngOnInit() {
     this.oidcSecurityService.checkAuth().subscribe(({isAuthenticated, userData}) => {
       this.isAuthenticated = isAuthenticated;
       this.userData = userData;
-      if (isAuthenticated) {
-        this.load();
-        this.openCreateUser();
-      } else this.oidcSecurityService.authorize();
+      if (isAuthenticated) this.load(); else this.oidcSecurityService.authorize();
     });
   }
 
   load() {
+    this.startLoading();
     this.oidcSecurityService.getAccessToken().subscribe((token) => {
       if (token) {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-        if (this.hasRole('coordenador') || this.hasRole('professor') || this.hasRole('aluno')) this.http.get(`${this.backendApiUrl}/discipline`, {
+        if (this.hasRole('administrador')) this.oidcSecurityService.getAccessToken().subscribe((token) => {
+          if (token) {
+            const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+            this.http.get(`${this.backendApiUrl}/user`, {
+              headers, observe: 'response'
+            }).subscribe((users) => {
+              this.users = (<[string, string, boolean, string][]>users.body).map(([id, username, enabled, role]) => ({
+                id, username, enabled, role
+              }));
+              this.loading = false;
+            });
+          }
+        }); else if (this.hasRole('coordenador') || this.hasRole('professor') || this.hasRole('aluno')) this.http.get(`${this.backendApiUrl}/discipline`, {
           headers, responseType: 'json'
         }).subscribe({
-          next: (response) => this.disciplines = response
+          next: (response) => {
+            this.disciplines = response;
+            this.loading = false;
+          }
         });
       }
     });
   }
 
   logout() {
+    this.loading = true;
     this.oidcSecurityService.logoffAndRevokeTokens().subscribe(() => {
       this.oidcSecurityService.logoffLocal();
     });
@@ -56,7 +72,7 @@ export class AppComponent implements OnInit {
   }
 
   createDiscipline() {
-    this.loading = true;
+    this.startLoading();
     this.oidcSecurityService.getAccessToken().subscribe((token) => {
       if (token) {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -84,29 +100,66 @@ export class AppComponent implements OnInit {
     });
   }
 
-  openCreateUser() {
-
+  createUser() {
+    this.startLoading();
+    this.oidcSecurityService.getAccessToken().subscribe((token) => {
+      if (token) {
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+        this.http.post(`${this.backendApiUrl}/user`, {
+          name: this.newUsername, role: this.newRole, password: this.newPassword
+        }, {headers, observe: 'response'}).subscribe(() => {
+          this.loading = false;
+          this.newUsername = '';
+          this.newPassword = '';
+          this.newRole = '';
+          this.load();
+        });
+      }
+    });
   }
 
-  editUser(user: any) {
-
+  enableUser(user: any) {
+    this.startLoading();
+    this.oidcSecurityService.getAccessToken().subscribe((token) => {
+      if (token) {
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+        this.http.patch(`${this.backendApiUrl}/user`, {id: user.id}, {
+          headers, observe: 'response'
+        }).subscribe(() => {
+          this.loading = false;
+          this.load();
+        });
+      }
+    });
   }
 
-  deleteUser(user: any) {
+  newUserInvalid() {
+    if (this.loading) return 'Carregando';
 
+    this.newUsername = this.newUsername.trim();
+    if (!this.newUsername) return 'Preencha o nome';
+    if (!this.newPassword.trim()) return 'Preencha a senha';
+    if (!this.newRole) return 'Preencha o tipo';
+    return false;
   }
 
   newDisciplineInvalid() {
-    if (this.loading) {
-      setTimeout(() => this.loading = false, 3000);
-      return 'Carregando';
-    }
-    if (this.newSemesterNumber > 99) return 'Disciplina com mais de dois dígitos';
+    if (this.loading) return 'Carregando';
+
+    this.newDisciplineTitle = this.newDisciplineTitle.trim();
+    this.newCourseTitle = this.newCourseTitle.trim();
+    if (!this.newDisciplineTitle) return 'Preencha a Disciplina';
+    if (!this.newCourseTitle) return 'Preencha o Curso';
+    if (this.newSemesterNumber <= 0) return 'Semestre deve ser positivo';
+    if (this.newSemesterNumber > 99) return 'Semestre com mais de dois dígitos';
     if (this.disciplines.some((discipline: {
-      name: string;
-      course: string;
-    }) => discipline.name === this.newDisciplineTitle.trim() && discipline.course === this.newCourseTitle.trim()))
-      return 'Disciplina já cadastrada para esse curso esse semestre';
+      name: string; course: string;
+    }) => discipline.name === this.newDisciplineTitle && discipline.course === this.newCourseTitle)) return 'Disciplina já cadastrada para esse curso esse semestre';
     return false;
+  }
+
+  startLoading() {
+    this.loading = true;
+    setTimeout(() => this.loading = false, 3000);
   }
 }

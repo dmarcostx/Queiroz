@@ -1,57 +1,80 @@
-<!-- dashboard.component.html -->
 <div class="container">
+  <!-- Indicador de carregamento -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
 
-  <!-- Conteúdo principal -->
   <main class="content">
-    <button (click)="logout()">Sair</button>
+    <button (click)="logout()" class="logout-btn">Sair</button>
 
-    <!-- CRUD Usuários (admin) -->
     <section id="users" *ngIf="hasRole('administrador')">
       <h2>Gestão de Usuários</h2>
-      <button (click)="openCreateUser()">Novo Usuário</button>
+      <div class="creation-forms">
+        <div class="form-group">
+          <h3>Criar Usuário</h3>
+          <input type="text" placeholder="Nome" [(ngModel)]="newUsername" />
+          <input type="password" placeholder="Senha" [(ngModel)]="newPassword" />
+          <select [(ngModel)]="newRole" name="role" id="role">
+            <option value="administrador">Administrador</option>
+            <option value="coordenador">Coordenador</option>
+            <option value="professor">Professor</option>
+            <option value="aluno">Aluno</option>
+          </select>
+          <span *ngIf="newUserInvalid()">{{ newUserInvalid() }}</span>
+          <button *ngIf="!newUserInvalid()" (click)="createUser()">Novo Usuário</button>
+        </div>
+      </div>
+
       <table>
         <thead>
-        <tr><th>Usuário</th><th>Email</th><th>Ações</th></tr>
+        <tr>
+          <th>Username</th>
+          <th>Tipo</th>
+          <th>Ações</th>
+        </tr>
         </thead>
         <tbody>
         <tr *ngFor="let user of users">
-          <td>{{ user.username }}</td>
-          <td>{{ user.email }}</td>
-          <td>
-            <button (click)="editUser(user)">Editar</button>
-            <button (click)="deleteUser(user)">Excluir</button>
+          <td data-label="Username">{{ user.username }}</td>
+          <td data-label="Tipo">{{ user.role }}</td>
+          <td data-label="Ações">
+            <button *ngIf="!loading && !user.enabled" (click)="enableUser(user)">Habilitar</button>
+            <button *ngIf="!loading && user.enabled" (click)="enableUser(user)">Desabilitar</button>
           </td>
         </tr>
         </tbody>
       </table>
     </section>
 
-    <!-- CRUD Acadêmico -->
     <section id="academics" *ngIf="hasRole('coordenador') || hasRole('professor') || hasRole('aluno')">
       <h2>Gestão Acadêmica</h2>
 
-      <!-- Formulário de criação -->
       <div class="creation-forms" *ngIf="hasRole('coordenador')">
         <div class="form-group">
           <h3>Criar Disciplina</h3>
           <input type="text" placeholder="Título da disciplina" [(ngModel)]="newDisciplineTitle" />
-          <input type="number" placeholder="Número do semestre" [(ngModel)]="newSemesterNumber" max="99" />
+          <input type="number" placeholder="Número do semestre" [(ngModel)]="newSemesterNumber" />
           <input type="text" placeholder="Título do curso" [(ngModel)]="newCourseTitle" />
-          <span *ngIf="newDisciplineInvalid()">{{newDisciplineInvalid()}}</span>
+          <span *ngIf="newDisciplineInvalid()">{{ newDisciplineInvalid() }}</span>
           <button *ngIf="!newDisciplineInvalid()" (click)="createDiscipline()">Adicionar</button>
         </div>
       </div>
 
       <table *ngIf="hasRole('coordenador') || hasRole('professor') || hasRole('aluno')">
         <thead>
-        <tr><th>Curso</th><th>Semestre</th><th>Disciplina</th><th *ngIf="hasRole('coordenador')">Ações</th></tr>
+        <tr>
+          <th>Curso</th>
+          <th>Semestre</th>
+          <th>Disciplina</th>
+          <th *ngIf="hasRole('coordenador')">Ações</th>
+        </tr>
         </thead>
         <tbody>
         <tr *ngFor="let discipline of disciplines">
-          <td>{{ discipline.course }}</td>
-          <td>{{ discipline.semester }}</td>
-          <td>{{ discipline.name }}</td>
-          <td *ngIf="hasRole('coordenador')">
+          <td data-label="Curso">{{ discipline.course }}</td>
+          <td data-label="Semestre">{{ discipline.semester }}</td>
+          <td data-label="Disciplina">{{ discipline.name }}</td>
+          <td data-label="Ações" *ngIf="hasRole('coordenador')">
             <button (click)="deleteDiscipline(discipline)">Excluir</button>
           </td>
         </tr>

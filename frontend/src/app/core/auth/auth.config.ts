@@ -6,7 +6,7 @@ export const authConfig: PassedInitialConfig = {
     redirectUrl: window.location.origin + '/callback',
     postLogoutRedirectUri: window.location.origin + '/logout',
     clientId: 'angular-frontend-client',
-    scope: 'openid profile email',
+    scope: 'openid profile',
     responseType: 'code',
     silentRenew: true,
     useRefreshToken: true,
