@@ -37,18 +37,6 @@ services:
     networks:
       - app-network
 
-  keycloak-proxy:
-    image: nginx:1.27-alpine
-    container_name: keycloak_proxy
-    depends_on:
-      - keycloak
-    ports:
-      - "8181:8181"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d:ro
-    networks:
-      - app-network
-
   backend:
     build:
       context: ./backend
